@@ -13,40 +13,39 @@ def edge_tuple_creator(array):
     return result
 
 
+###Ford-Faulkerson Method
 def max_flow(G: nx.DiGraph, s: Any, t: Any) -> int:
     value: int = 0
     G_tmp = copy.deepcopy(G)
 
     while True:
         try:
-            path = nx.shortest_path(G_tmp, s, t)
+            path = nx.shortest_path(G_tmp, s, t)  ###перебираем все пути пока они не закончатся
         except nx.NetworkXNoPath:
             break
 
         print(f'path = {path}')
 
-        path_edges = edge_tuple_creator(path)
+        path_edges = edge_tuple_creator(path)  ###создаём список с гранями
         min_flow_local = np.inf
 
-        for i in range(len(path) - 1):
-            weight_list = nx.get_edge_attributes(G_tmp, "weight")
+        for i in range(len(path_edges)):  ###пробегаемся по всем граням из списка
+            weight_list = nx.get_edge_attributes(G_tmp, "weight")  ###подтягиваем список весов
             if weight_list[path_edges[i]] < min_flow_local:
-                min_flow_local = weight_list[path_edges[i]]
+                min_flow_local = weight_list[path_edges[i]]  ###находим минимальный поток данного пути
         print(f'minimal flow = {min_flow_local}')
-        value += min_flow_local
+        value += min_flow_local  ###добавляем к общему максимальному потоку
 
-        for j in range(len(path) - 1):
+        for j in range(len(path_edges)):
             edge_tuple = path_edges[j]
-            G_tmp.edges[edge_tuple]["weight"] -= min_flow_local
+            G_tmp.edges[edge_tuple][
+                "weight"] -= min_flow_local  # ##вычитаем полученный минимальный поток из веса каждого
+            # использованного ребра
 
             if G_tmp.edges[edge_tuple]["weight"] == 0:
-                G_tmp.remove_edge(edge_tuple[0], edge_tuple[1])
+                G_tmp.remove_edge(edge_tuple[0], edge_tuple[1]) ###удаляем ребро при его нулевом весе
 
-            if edge_tuple[::-1] not in G_tmp.edges:
-                G_tmp.add_edge(edge_tuple[::-1][0], edge_tuple[::-1][1])
-                G_tmp.edges[edge_tuple[::-1]]["weight"] = min_flow_local
-            else:
-                G_tmp.edges[edge_tuple[::-1]]["weight"] += min_flow_local
+
     return value
 
 

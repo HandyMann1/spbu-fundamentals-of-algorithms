@@ -30,7 +30,7 @@ def lu(A: NDArray, permute: bool) -> tuple[NDArray, NDArray, NDArray]:
             U[[j, max_index]] = U[[max_index, j]]
             P[[j, max_index]] = P[[max_index, j]]
         for i in range(j + 1, n):
-            L[i, j] = U[i, j] / U[j, j]
+            L[i, j] = U[i, j] / U[j, j] ### lu - разложение
             U[i, j:] -= L[i, j] * U[j, j:]
 
     return L, U, P
@@ -38,7 +38,7 @@ def lu(A: NDArray, permute: bool) -> tuple[NDArray, NDArray, NDArray]:
 
 def solve(L: NDArray, U: NDArray, P: NDArray, b: NDArray) -> NDArray:
     n = L.shape[0]
-    y = P @ b
+    y = P @ b 
     x = np.zeros_like(y)
     for i in range(n):
         x[i] = (y[i] - L[i, :i] @ x[:i]) / L[i, i]
